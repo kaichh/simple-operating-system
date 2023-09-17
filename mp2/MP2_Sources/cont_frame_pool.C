@@ -109,7 +109,8 @@
 /* DATA STRUCTURES */
 /*--------------------------------------------------------------------------*/
 
-/* -- (none) -- */
+ContFramePool * ContFramePool::pool_head = NULL;
+int ContFramePool::pool_num = 0;
 
 /*--------------------------------------------------------------------------*/
 /* CONSTANTS */
@@ -200,12 +201,12 @@ ContFramePool::ContFramePool(unsigned long _base_frame_no,
         pool_next = NULL;
     } else {
         ContFramePool * cur = pool_head;
-        for(int i = 1; i < num_pools; i++){
+        for(int i = 1; i < pool_num; i++){
             cur = cur->pool_next;
         }
         cur->pool_next = this;
     }
-    num_pools++;
+    pool_num++;
 }
 
 unsigned long ContFramePool::get_frames(unsigned int _n_frames)
@@ -270,7 +271,7 @@ void ContFramePool::release_frames(unsigned long _first_frame_no)
 {
     ContFramePool * cur_pool = pool_head;
     while(_first_frame_no < cur_pool->base_frame_no || _first_frame_no > (cur_pool->base_frame_no + cur_pool->nframes)){
-        cur_pool = cur_pool->next;
+        cur_pool = cur_pool->pool_next;
     }
 
     cur_pool->release_frame_within_pool(_first_frame_no);
