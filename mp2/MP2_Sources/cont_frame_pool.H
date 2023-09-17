@@ -57,7 +57,7 @@ private:
 
     FrameState get_state(unsigned long _frame_no);
     void set_state(unsigned long _frame_no, FrameState _state);
-    
+    void release_frame_in_pool(unsigned long _first_frame_no);
     
 public:
 
@@ -110,12 +110,6 @@ public:
      This function must first identify the correct frame pool and then call the frame
      pool's release_frame function.
      */
-
-    void release_frame_within_pool(unsigned long _first_frame_no);
-    /*
-      Releases a previously allocated contiguous sequence of frames
-      back to this frame pool.
-    */
     
     static unsigned long needed_info_frames(unsigned long _n_frames);
     /*

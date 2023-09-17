@@ -274,10 +274,10 @@ void ContFramePool::release_frames(unsigned long _first_frame_no)
         cur_pool = cur_pool->pool_next;
     }
 
-    cur_pool->release_frame_within_pool(_first_frame_no);
+    cur_pool->release_frame_in_pool(_first_frame_no);
 }
 
-void ContFramePool::release_frame_within_pool(unsigned long _first_frame_no)
+void ContFramePool::release_frame_in_pool(unsigned long _first_frame_no)
 {
     unsigned long cur_frame = _first_frame_no - base_frame_no;
     
