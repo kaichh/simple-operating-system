@@ -3,8 +3,10 @@
 #include "utils.H"
 #include "assert.H"
 
+// Need bitmap[]?
+
 SimpleFramePool::FrameState SimpleFramePool::get_state(unsigned long _frame_no) {
-    unsigned int bitmap_index = _frame_no / 8;
+    unsigned int bitmap_index = _frame_no / 8; // 8 bits per byte?
     unsigned char mask = 0x1 << (_frame_no % 8);
     
     return ((bitmap[bitmap_index] & mask) == 0) ? FrameState::Used : FrameState::Free;
@@ -17,10 +19,10 @@ void SimpleFramePool::set_state(unsigned long _frame_no, FrameState _state) {
 
     switch(_state) {
       case FrameState::Used:
-      bitmap[bitmap_index] ^= mask;
+      bitmap[bitmap_index] ^= mask; //XOR
       break;
     case FrameState::Free:
-      bitmap[bitmap_index] |= mask;
+      bitmap[bitmap_index] |= mask; //OR
       break;
     }
     

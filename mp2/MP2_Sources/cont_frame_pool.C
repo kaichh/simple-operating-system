@@ -126,41 +126,175 @@
 /*--------------------------------------------------------------------------*/
 /* METHODS FOR CLASS   C o n t F r a m e P o o l */
 /*--------------------------------------------------------------------------*/
+ContFramePool::FrameState ContFramePool::get_state(unsigned long _frame_no) {
+    unsigned int bitmap_index = _frame_no / 4; // 2 bits per frame,  1 byte can represent 4 frames
+    unsigned char mask = 0x3; 
+    unsigned char target = bitmap[bitmap_index] >> ((_frame_no % 4) * 2);
+
+    switch (target & mask) {
+        case 0x0:
+            return FrameState::Free;
+        case 0x1:
+            return FrameState::Used;
+        case 0x2:
+            return FrameState::HoS;
+        default:
+            assert(false);
+    }    
+}
+
+void ContFramePool::set_state(unsigned long _frame_no, FrameState _state) {
+    unsigned int bitmap_index = _frame_no / 4;
+    unsigned char mask_init = 0x3 << ((_frame_no % 4) * 2); 
+    unsigned char mask;
+    bitmap[bitmap_index] &= ~mask_init; //set the bits to 00
+    
+
+    switch(_state) {
+        case FrameState::Free:
+            mask = 0x0 << ((_frame_no % 4) * 2);
+            break;
+        case FrameState::Used:
+            mask = 0x1 << ((_frame_no % 4) * 2);
+            break;
+        case FrameState::HoS:
+            mask = 0x2 << ((_frame_no % 4) * 2);
+            break;
+    }
+    bitmap[bitmap_index] ^= mask; 
+
+}
+    
 
 ContFramePool::ContFramePool(unsigned long _base_frame_no,
                              unsigned long _n_frames,
                              unsigned long _info_frame_no)
 {
-    // TODO: IMPLEMENTATION NEEEDED!
-    Console::puts("ContframePool::Constructor not implemented!\n");
-    assert(false);
+    base_frame_no = _base_frame_no;
+    nframes = _n_frames;
+    nFreeFrames = _n_frames;
+    info_frame_no = _info_frame_no;
+
+    // If _info_frame_no is zero then we keep management info in the first
+    //frame, else we use the provided frame to keep management info
+    if(info_frame_no == 0) {
+        bitmap = (unsigned char *) (base_frame_no * FRAME_SIZE);
+    } else {
+        bitmap = (unsigned char *) (info_frame_no * FRAME_SIZE);
+    }
+
+    // Proceed to mark all frame as free.
+    for(int fno = 0; fno < nframes; fno++) {
+        set_state(fno, FrameState::Free);
+    }
+
+    // Mark the first frame as being used if it is being used
+    if(_info_frame_no == 0) {
+        set_state(0, FrameState::HoS);
+        nFreeFrames--;
+    }
+
+    // Manage the linked list of frame pools
+    if(pool_head == NULL){
+        pool_head = this;
+        pool_next = NULL;
+    } else {
+        ContFramePool * cur = pool_head;
+        for(int i = 1; i < num_pools; i++){
+            cur = cur->pool_next;
+        }
+        cur->pool_next = this;
+    }
+    num_pools++;
 }
 
 unsigned long ContFramePool::get_frames(unsigned int _n_frames)
 {
-    // TODO: IMPLEMENTATION NEEEDED!
-    Console::puts("ContframePool::get_frames not implemented!\n");
-    assert(false);
+    if(_n_frames > nFreeFrames){
+        return 0;
+    }
+
+    unsigned long start_frame = 0;
+    unsigned long cur_frame = 0;
+    unsigned int count = 0;
+    bool found = false;
+    
+    while(start_frame <= nframes) {
+        count = 0;
+        cur_frame = start_frame;
+
+        while(cur_frame < nframes && get_state(cur_frame) == FrameState::Free){
+            count++;
+            if (count == _n_frames){
+                found = true;
+                break;
+            }
+            cur_frame++;
+        }
+
+        if(found){
+            break;
+        } else {
+            start_frame = cur_frame + 1;
+        }
+    }
+
+    // If we found an available sequence of frames, mark them as used, then return the first frame
+    if(found) {
+        set_state(start_frame, FrameState::HoS);
+        nFreeFrames--;
+        for(int i = 1; i < _n_frames; i++){
+            set_state(start_frame + i, FrameState::Used);
+            nFreeFrames--;
+        }
+        return base_frame_no + start_frame;
+    } else {
+        return 0;
+    }
+
 }
 
 void ContFramePool::mark_inaccessible(unsigned long _base_frame_no,
                                       unsigned long _n_frames)
 {
-    // TODO: IMPLEMENTATION NEEEDED!
-    Console::puts("ContframePool::mark_inaccessible not implemented!\n");
-    assert(false);
+    // Mark all frames in the range as being used.
+    set_state(_base_frame_no - base_frame_no, FrameState::HoS);
+    nFreeFrames--;
+    for(int i = 1; i < _n_frames; i++){
+        set_state(_base_frame_no - base_frame_no + i, FrameState::Used);
+        nFreeFrames--;
+    }
 }
 
 void ContFramePool::release_frames(unsigned long _first_frame_no)
 {
-    // TODO: IMPLEMENTATION NEEEDED!
-    Console::puts("ContframePool::release_frames not implemented!\n");
-    assert(false);
+    ContFramePool * cur_pool = pool_head;
+    while(_first_frame_no < cur_pool->base_frame_no || _first_frame_no > (cur_pool->base_frame_no + cur_pool->nframes)){
+        cur_pool = cur_pool->next;
+    }
+
+    cur_pool->release_frame_within_pool(_first_frame_no);
+}
+
+void ContFramePool::release_frame_within_pool(unsigned long _first_frame_no)
+{
+    unsigned long cur_frame = _first_frame_no - base_frame_no;
+    
+    // If the frame is not the head of a sequence, then something went wrong
+    assert(get_state(cur_frame) == FrameState::HoS);
+
+    set_state(cur_frame, FrameState::Free);
+    nFreeFrames++;
+    cur_frame++;
+    while(cur_frame < nframes && get_state(cur_frame) == FrameState::Used){
+        set_state(cur_frame, FrameState::Free);
+        nFreeFrames++;
+        cur_frame++;
+    }
 }
 
 unsigned long ContFramePool::needed_info_frames(unsigned long _n_frames)
 {
-    // TODO: IMPLEMENTATION NEEEDED!
-    Console::puts("ContframePool::need_info_frames not implemented!\n");
-    assert(false);
+    unsigned long frames_per_bitmap = 4096 * 8 / 2; // How many frames a 1-frame bitmap can manage? 2 bits per frame, 1 byte can represent 4 frames
+    return _n_frames / frames_per_bitmap + (_n_frames % frames_per_bitmap > 0 ? 1 : 0);
 }

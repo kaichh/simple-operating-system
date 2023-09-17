@@ -42,7 +42,15 @@ class ContFramePool {
     
 private:
     /* -- DEFINE YOUR CONT FRAME POOL DATA STRUCTURE(s) HERE. */
-    
+    static int num_pools;
+    static ContFramePool * pool_head;
+    ContFramePool * pool_next;
+    unsigned char * bitmap;        // We implement the simple frame pool with a bitmap
+    unsigned int    nFreeFrames;   //
+    unsigned long   base_frame_no; // Where does the frame pool start in phys mem?
+    unsigned long   nframes;       // Size of the frame pool
+    unsigned long   info_frame_no; // Where do we store the management information?
+    unsigned long   frames_per_bitmap = FRAME_SIZE * 8 / 2; // How many frames a 1-frame bitmap can manage? 2 bits per frame, 1 byte can represent 4 frames
     
     
     /* ---- STATE MANAGEMENT */
@@ -104,6 +112,12 @@ public:
      This function must first identify the correct frame pool and then call the frame
      pool's release_frame function.
      */
+
+    void release_frame_within_pool(unsigned long _first_frame_no);
+    /*
+      Releases a previously allocated contiguous sequence of frames
+      back to this frame pool.
+    */
     
     static unsigned long needed_info_frames(unsigned long _n_frames);
     /*

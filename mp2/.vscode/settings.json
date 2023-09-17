@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "*.js": "javascriptreact",
+    "simple_frame_pool.C": "cpp",
+    "cont_frame_pool.C": "cpp",
+    "console.C": "cpp",
+    "kernel.C": "cpp",
+    "machine.C": "cpp"
+  }
+}
