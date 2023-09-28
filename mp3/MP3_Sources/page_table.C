@@ -16,14 +16,17 @@ void PageTable::init_paging(ContFramePool * _kernel_mem_pool,
                             ContFramePool * _process_mem_pool,
                             const unsigned long _shared_size)
 {
-   assert(false);
-   Console::puts("Initialized Paging System\n");
+   PageTable::kernel_mem_pool = _kernel_mem_pool;
+   PageTable::process_mem_pool = _process_mem_pool;
+   PageTable::shared_size = _shared_size;
 }
 
 PageTable::PageTable()
 {
-   assert(false);
-   Console::puts("Constructed Page Table object\n");
+   // assert(false);
+   // Console::puts("Constructed Page Table object\n");
+
+   
 }
 
 
