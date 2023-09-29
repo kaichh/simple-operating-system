@@ -140,7 +140,7 @@ ContFramePool::FrameState ContFramePool::get_state(unsigned long _frame_no) {
         case 0x2:
             return FrameState::HoS;
         default:
-            assert(false);
+            return FrameState::Used;
     }    
 }
 

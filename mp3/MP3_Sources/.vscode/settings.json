@@ -6,6 +6,7 @@
     "kernel.C": "cpp",
     "simple_keyboard.C": "cpp",
     "cont_frame_pool.C": "cpp",
-    "page_table.C": "cpp"
+    "page_table.C": "cpp",
+    "exceptions.C": "cpp"
   }
 }
