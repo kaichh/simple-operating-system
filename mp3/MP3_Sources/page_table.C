@@ -68,7 +68,7 @@ void PageTable::handle_fault(REGS * _r)
    unsigned long page_table_index = (fault_address >> 12) & 0x3FF;
    unsigned long * page_table = (unsigned long *) (current_page_table->page_directory[page_directory_index] & 0xFFFFF000);
    
-   if (current_page_table->page_directory[page_directory_index] & 1 == 0)
+   if ((current_page_table->page_directory[page_directory_index] & 1) == 0)
    {
       // The page directory entry is not present
       // Allocate a frame for the page table
