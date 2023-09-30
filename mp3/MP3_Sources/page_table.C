@@ -59,6 +59,7 @@ void PageTable::load()
 void PageTable::enable_paging()
 {
    write_cr0(read_cr0() | 0x80000000); // Set the paging bit in CR0 to 1
+   paging_enabled = 1;
 }
 
 void PageTable::handle_fault(REGS * _r)
