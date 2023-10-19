@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    "*.js": "javascriptreact",
+    "page_table.C": "cpp",
+    "machine.C": "cpp",
+    "cont_frame_pool.C": "cpp"
+  }
+}
