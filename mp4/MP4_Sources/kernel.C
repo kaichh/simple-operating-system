@@ -72,7 +72,7 @@ void GenerateVMPoolMemoryReferences(VMPool *pool, int size1, int size2);
 
 VMPool *current_pool;
 
-typedef long unsigned int size_t;
+typedef long unsigned int size_t; // long unsigned int == unsigned long
 
 //replace the operator "new"
 void * operator new (size_t size) {
