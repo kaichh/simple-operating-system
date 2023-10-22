@@ -46,7 +46,7 @@ PageTable::PageTable()
     {
         if(i == 1023) {
             // Set the last entry to point to the page directory itself
-            page_directory[i] = (unsigned long) page_directory;
+            page_directory[i] = (unsigned long) page_directory | 3;
         }
         else {
             page_directory[i] = 0 | 2; // Set supervisor, read/write, not present mode. This means the last 3 bits is 010
@@ -59,7 +59,7 @@ void PageTable::load()
 {
     current_page_table = this;
     // Store the address of the page_directory to CR3
-    write_cr3((unsigned long) this->page_directory);
+    write_cr3((unsigned long) current_page_table->page_directory);
 }
 
 void PageTable::enable_paging()
@@ -76,17 +76,9 @@ void PageTable::handle_fault(REGS * _r)
     unsigned long * PD_recursive_addr = (unsigned long *) 0xFFFFF000; // 1023 | 1023 | 0 * 12
     unsigned long * PT_recursive_addr = (unsigned long *) (0xFFC00000 | page_directory_index << 12); // 1023 | page_directory_index | 0 * 12
     
-    //unsigned long * page_table = (unsigned long *) (current_page_table->page_directory[page_directory_index] & 0xFFFFF000); 
-
-    // If there is no VM pool registered, then we cannot handle the fault
-    if (vm_pool_head == NULL) {
-        Console::puts("No VM pool registered\n");
-        assert(false);
-    }
-
     // Find which pool the fault address belongs to
     VMPool * curr_pool = vm_pool_head;
-    int found = false;
+    bool found = false;
     while (curr_pool != NULL)
     {
         if (curr_pool->is_legitimate(fault_address)) {
@@ -96,11 +88,10 @@ void PageTable::handle_fault(REGS * _r)
         curr_pool = curr_pool->next;
     }
 
-    if(!found) {
-        Console::puts("No VM pool found\n");
+    if(!found && curr_pool != NULL) {
+        Console::puts("Can't find the address in any VM pool\n");
         assert(false);
     }
-
 
     if ((PD_recursive_addr[page_directory_index] & 1) == 0) {
         // The page directory entry is not present
@@ -118,10 +109,7 @@ void PageTable::handle_fault(REGS * _r)
     } 
     else {
         // The page table page entry is not present
-        // Allocate a frame for the page
-        unsigned long new_frame = (unsigned long) (process_mem_pool->get_frames(1) * PAGE_SIZE);
-        // Set the page table entry to the new frame
-        PT_recursive_addr[page_table_index] = new_frame | 3; // Set supervisor, read/write, present mode. This means the last 3 bits is 011
+        PT_recursive_addr[page_table_index] = (process_mem_pool->get_frames(1) * PAGE_SIZE) | 3; 
     }
 }
 
@@ -149,9 +137,10 @@ void PageTable::free_page(unsigned long _page_no) {
     if((PT_recursive_addr[pt_index] & 1) == 1) {
         // The page is valid
         // Release the frame
-        process_mem_pool->release_frames(PT_recursive_addr[pt_index] & 0xFFFFF000);
+        process_mem_pool->release_frames(PT_recursive_addr[pt_index] / PAGE_SIZE);
         // Mark the page as invalid
         PT_recursive_addr[pt_index] = 2; // Set supervisor, read/write, not present mode. This means the last 3 bits is 010
+        load();
     }
     Console::puts("freed page\n");
 }

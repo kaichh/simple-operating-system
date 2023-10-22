@@ -219,7 +219,7 @@ int main() {
 
     /* BY DEFAULT WE TEST THE PAGE TABLE IN MAPPED MEMORY!
        (COMMENT OUT THE FOLLOWING LINE TO TEST THE VM Pools! */
-#define _TEST_PAGE_TABLE_
+//#define _TEST_PAGE_TABLE_
 
 #ifdef _TEST_PAGE_TABLE_
 
@@ -278,13 +278,18 @@ void GenerateVMPoolMemoryReferences(VMPool *pool, int size1, int size2) {
   // Here we test the VMPool 
    current_pool = pool;
    for(int i=1; i<size1; i++) {
+      Console::puts("Allocating i=");
+      Console::puti(i);
+      Console::puts("\n");
       int *arr = new int[size2 * i];
       if(pool->is_legitimate((unsigned long)arr) == false) {
          TestFailed();
       }
+      Console::puts("Writing to array...\n");
       for(int j=0; j<size2*i; j++) {
          arr[j] = j;
       }
+      Console::puts("Checking array...\n");
       for(int j=size2*i - 1; j>=0; j--) {
          if(arr[j] != j) {
             TestFailed();

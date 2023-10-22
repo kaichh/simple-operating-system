@@ -67,7 +67,7 @@ VMPool::VMPool(unsigned long  _base_address,
 
 unsigned long VMPool::allocate(unsigned long _size) {
     // Calculate the number of frames needed to allocate the requested size. Equivilent to ceil(_size / PAGE_SIZE).
-    int allocating_frames = (_size - 1) / Machine::PAGE_SIZE + 1;
+    int allocating_frames = ((_size - 1) / Machine::PAGE_SIZE) + 1;
     unsigned long allocating_size = (unsigned long) allocating_frames * Machine::PAGE_SIZE;
 
     // Check if there are enough frames to allocate the requested size.
@@ -119,7 +119,7 @@ unsigned long VMPool::allocate(unsigned long _size) {
 
 void VMPool::release(unsigned long _start_address) {
     // Walk through all the regions and find the region that contains the given address.
-    region_to_delete = -1;
+    int region_to_delete = -1;
     for(int i = 0; i < total_regions; i++) {
         if(allocated_region_array[i].base_address == _start_address) {
             region_to_delete = i;
@@ -129,9 +129,10 @@ void VMPool::release(unsigned long _start_address) {
 
     // If the given address is not in the allocated region, return.
     if(region_to_delete == -1) {
-        return;
+        Console::puts("The given address is not in the allocated region.\n");
+        assert(false);
     }
-
+    
     // Free the pages in the region.
     for(int i = 0; i < allocated_region_array[region_to_delete].size / Machine::PAGE_SIZE; i++) {
         page_table->free_page(allocated_region_array[region_to_delete].base_address + i * Machine::PAGE_SIZE);
@@ -147,7 +148,9 @@ void VMPool::release(unsigned long _start_address) {
 }
 
 bool VMPool::is_legitimate(unsigned long _address) {
-    if(_address < base_address || _address >= base_address + size) {
+    // If the address is not starting from the second page in the pool or out of bound of the pool, return false.
+    // Since the first page is for the allocated region array.
+    if(_address < base_address + Machine::PAGE_SIZE || _address >= base_address + size) {
         return false;
     }
     return true;
