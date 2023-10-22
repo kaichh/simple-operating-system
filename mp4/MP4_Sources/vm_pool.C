@@ -73,7 +73,6 @@ unsigned long VMPool::allocate(unsigned long _size) {
     // Check if there are enough frames to allocate the requested size.
     // First we walk through all the regions and check if there is enough space between them to allocate the requested size.
     // If there is enough space, we insert the new region in between. If not, we add the new region to the end of the array.
-
     if(total_regions == 0) {
         // If there are no regions, we can allocate the requested size at the second frame in the pool, 
         // since the first frame is used for the allocated region array.
@@ -98,7 +97,6 @@ unsigned long VMPool::allocate(unsigned long _size) {
                 break;
             }
         }
-
         if(!found) {
             // If there is not enough space between the regions, we add the new region to the end of the array.
             // But first check if the adding new region will out of bound of the pool.
@@ -113,7 +111,6 @@ unsigned long VMPool::allocate(unsigned long _size) {
     }
     total_regions++;
     Console::puts("Allocated region of memory.\n");
-        
     return allocated_region_array[total_regions-1].base_address;   
 }
 
