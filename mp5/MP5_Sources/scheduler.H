@@ -106,18 +106,4 @@ public:
       Graciously handle the case where the thread wants to terminate itself.*/
   
 };
-
-
-// class RRScheduler: public Scheduler {
-//    TQueue * ready_queue;
-//    EOQTimer * eoq_timer;
-
-// public:
-//    RRScheduler(EOQTimer * _eoq_timer);
-//    void yield();
-// };
-	
-	
-	
-
 #endif
