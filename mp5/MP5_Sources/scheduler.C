@@ -135,24 +135,3 @@ void Scheduler::terminate(Thread * _thread) {
   
   if(!Machine::interrupts_enabled()) Machine::enable_interrupts();
 }
-
-
-RRScheduler::RRScheduler(EOQTimer * _eoq_timer){
-  eoq_timer = _eoq_timer;
-}
-
-void RRScheduler::yield(){
-  if(Machine::interrupts_enabled()) Machine::disable_interrupts();
-
-  if(ready_queue->head == NULL) {
-    Console::puts("No threads to run.\n");
-    if(!Machine::interrupts_enabled()) Machine::enable_interrupts();
-    return;
-  }else {
-    eoq_timer->reset();
-    Thread * next_thread = TQueue::pop();
-    Thread::dispatch_to(next_thread);
-  }
-
-  if(!Machine::interrupts_enabled()) Machine::enable_interrupts();
-}

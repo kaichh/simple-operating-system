@@ -89,8 +89,6 @@ public:
     void delete_thread();
     /* Clean the memory of the thread */
 
-    static void yield_current();
-    /* Yield the current thread and run the next thread. */
 };
 
 #endif

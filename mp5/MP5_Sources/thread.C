@@ -220,8 +220,3 @@ Thread * Thread::CurrentThread() {
 void Thread::delete_thread() {
     delete stack;
 }
-
-void Thread::yield_current() {
-    SYSTEM_SCHEDULER->resume(Thread::CurrentThread());
-    SYSTEM_SCHEDULER->yield();
-}

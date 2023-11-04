@@ -108,14 +108,14 @@ public:
 };
 
 
-class RRScheduler: public Scheduler {
-   TQueue * ready_queue;
-   EOQTimer * eoq_timer;
+// class RRScheduler: public Scheduler {
+//    TQueue * ready_queue;
+//    EOQTimer * eoq_timer;
 
-public:
-   RRScheduler(EOQTimer * _eoq_timer);
-   void yield();
-};
+// public:
+//    RRScheduler(EOQTimer * _eoq_timer);
+//    void yield();
+// };
 	
 	
 	
