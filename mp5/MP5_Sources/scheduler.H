@@ -20,6 +20,7 @@
 /*--------------------------------------------------------------------------*/
 
 #include "thread.H"
+#include "simple_timer.H"
 
 /*--------------------------------------------------------------------------*/
 /* !!! IMPLEMENTATION HINT !!! */
@@ -53,8 +54,23 @@
 /*--------------------------------------------------------------------------*/
 /* SCHEDULER */
 /*--------------------------------------------------------------------------*/
+class TQueue {
+   public:
+      static TQueue * head;
+      static TQueue * tail;
+      Thread * thread;
+      TQueue * next;
+      
+      TQueue(Thread * _thread);
+      static void add(TQueue * _queue);
+      static Thread * pop();
+};
+
 
 class Scheduler {
+private:
+   // TQueue * ready_queue;
+   TQueue * ready_queue;
 
   /* The scheduler may need private members... */
   
@@ -90,6 +106,17 @@ public:
       Graciously handle the case where the thread wants to terminate itself.*/
   
 };
+
+
+class RRScheduler: public Scheduler {
+   TQueue * ready_queue;
+   EOQTimer * eoq_timer;
+
+public:
+   RRScheduler(EOQTimer * _eoq_timer);
+   void yield();
+};
+	
 	
 	
 

@@ -23,7 +23,7 @@
 
 /* -- COMMENT/UNCOMMENT THE FOLLOWING LINE TO EXCLUDE/INCLUDE SCHEDULER CODE */
 
-//#define _USES_SCHEDULER_
+#define _USES_SCHEDULER_
 /* This macro is defined when we want to force the code below to use
    a scheduler.
    Otherwise, no scheduler is used, and the threads pass control to each
@@ -33,11 +33,13 @@
 
 /* -- UNCOMMENT THE FOLLOWING LINE TO MAKE THREADS TERMINATING */
 
-//#define _TERMINATING_FUNCTIONS_
+#define _TERMINATING_FUNCTIONS_
 /* This macro is defined when we want the thread functions to return, and so
    terminate their thread.
    Otherwise, the thread functions don't return, and the threads run forever.
 */
+
+// #define _RR_SCHEDULER_
 
 /*--------------------------------------------------------------------------*/
 /* INCLUDES */
@@ -99,12 +101,18 @@ void operator delete[] (void * p) {
 /*--------------------------------------------------------------------------*/
 /* SCHEDULRE and AUXILIARY HAND-OFF FUNCTION FROM CURRENT THREAD TO NEXT */
 /*--------------------------------------------------------------------------*/
+#ifdef _RR_SCHEDULER_
+
+RRScheduler * SYSTEM_SCHEDULER;
+
+#else
 
 #ifdef _USES_SCHEDULER_
 
 /* -- A POINTER TO THE SYSTEM SCHEDULER */
 Scheduler * SYSTEM_SCHEDULER;
 
+#endif
 #endif
 
 void pass_on_CPU(Thread * _to_thread) {
@@ -251,6 +259,13 @@ int main() {
                  we enable interrupts correctly. If we forget to do it,
                  the timer "dies". */
 
+#ifdef _RR_SCHEDULER_
+
+    EOQTimer timer(1000);
+    InterruptHandler::register_handler(0, &timer);
+    SYSTEM_SCHEDULER = new RRScheduler(&timer);
+
+#else
     SimpleTimer timer(100); /* timer ticks every 10ms. */
     InterruptHandler::register_handler(0, &timer);
     /* The Timer is implemented as an interrupt handler. */
@@ -260,6 +275,8 @@ int main() {
     /* -- SCHEDULER -- IF YOU HAVE ONE -- */
  
     SYSTEM_SCHEDULER = new Scheduler();
+
+#endif
 
 #endif
 

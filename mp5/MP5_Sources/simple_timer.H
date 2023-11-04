@@ -67,4 +67,24 @@ public :
 
 };
 
+class EOQTimer: public SimpleTimer {
+private:
+  /* How long has the system been running? */
+  unsigned long seconds; 
+  int           ticks;   /* ticks since last "seconds" update.    */
+
+  /* At what frequency do we update the ticks counter? */
+  int hz;                /* Actually, by defaults it is 18.22Hz.
+                            In this way, a 16-bit counter wraps
+                            around every hour.                    */
+
+  void set_frequency(int _hz);
+  /* Set the interrupt frequency for the simple timer. */
+
+public:
+  EOQTimer(int _hz);
+  void handle_interrupt(REGS *_r);
+  void reset();
+};
+
 #endif

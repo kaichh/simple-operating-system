@@ -1,0 +1,12 @@
+{
+  "files.associations": {
+    "*.js": "javascriptreact",
+    "kernel.C": "cpp",
+    "thread.C": "cpp",
+    "mem_pool.C": "cpp",
+    "scheduler.C": "cpp",
+    "machine.C": "cpp",
+    "simple_timer.C": "cpp",
+    "interrupts.C": "cpp"
+  }
+}
