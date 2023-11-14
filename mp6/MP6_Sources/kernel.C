@@ -19,12 +19,14 @@
 
 /* -- COMMENT/UNCOMMENT THE FOLLOWING LINE TO EXCLUDE/INCLUDE SCHEDULER CODE */
 
-//#define _USES_SCHEDULER_
+#define _USES_SCHEDULER_
 /* This macro is defined when we want to force the code below to use 
    a scheduler.
    Otherwise, no scheduler is used, and the threads pass control to each 
    other in a co-routine fashion.
 */
+
+#define _BLOCKING_DISK_
 
 #define MB * (0x1 << 20)
 #define KB * (0x1 << 10)
@@ -53,7 +55,8 @@
 #endif
 
 #include "simple_disk.H"    /* DISK DEVICE */
-                            /* YOU MAY NEED TO INCLUDE blocking_disk.H
+                            /* YOU MAY NEED TO INCLUDE blocking_disk.H */
+#include "blocking_disk.H"
 /*--------------------------------------------------------------------------*/
 /* MEMORY MANAGEMENT */
 /*--------------------------------------------------------------------------*/
@@ -104,7 +107,11 @@ Scheduler * SYSTEM_SCHEDULER;
 /*--------------------------------------------------------------------------*/
 
 /* -- A POINTER TO THE SYSTEM DISK */
+#ifdef _BLOCKING_DISK_
+BlockingDisk * SYSTEM_DISK;
+#else
 SimpleDisk * SYSTEM_DISK;
+#endif
 
 #define SYSTEM_DISK_SIZE (10 MB)
 
@@ -180,7 +187,8 @@ void fun2() {
 
        /* -- Display */
        for (int i = 0; i < DISK_BLOCK_SIZE; i++) {
-           Console::putch(buf[i]);
+           Console::puti(buf[i]);
+        //    Console::putch(buf[i]);
        }
 
        Console::puts("Writing a block to disk...\n");
@@ -289,8 +297,11 @@ int main() {
 #endif
 
     /* -- DISK DEVICE -- */
-
+#ifdef _BLOCKING_DISK_
+    SYSTEM_DISK = new BlockingDisk(DISK_ID::MASTER, SYSTEM_DISK_SIZE);
+#else
     SYSTEM_DISK = new SimpleDisk(DISK_ID::MASTER, SYSTEM_DISK_SIZE);
+#endif
    
     /* NOTE: The timer chip starts periodically firing as 
              soon as we enable interrupts.
@@ -299,7 +310,7 @@ int main() {
 
     /* -- ENABLE INTERRUPTS -- */
 
-     Machine::enable_interrupts();
+    Machine::enable_interrupts();
 
     /* -- MOST OF WHAT WE NEED IS SETUP. THE KERNEL CAN START. */
 

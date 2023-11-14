@@ -85,6 +85,9 @@ public:
     static Thread * CurrentThread();
     /* Returns the currently running thread. NULL if no thread has started 
        yet. */
+
+    void delete_thread();
+    /* Clean the memory of the thread */
 };
 
 #endif

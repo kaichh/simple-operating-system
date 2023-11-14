@@ -1,0 +1,13 @@
+{
+  "files.associations": {
+    "*.js": "javascriptreact",
+    "kernel.C": "cpp",
+    "simple_disk.C": "cpp",
+    "blocking_disk.C": "cpp",
+    "exceptions.C": "cpp",
+    "scheduler.C": "cpp",
+    "mem_pool.C": "cpp",
+    "thread.C": "cpp",
+    "machine.C": "cpp"
+  }
+}

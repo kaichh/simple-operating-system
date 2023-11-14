@@ -210,3 +210,7 @@ Thread * Thread::CurrentThread() {
 /* Return the currently running thread. */
     return current_thread;
 }
+
+void Thread::delete_thread() {
+    delete stack;
+}
