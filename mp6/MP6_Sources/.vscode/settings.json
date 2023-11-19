@@ -8,6 +8,7 @@
     "scheduler.C": "cpp",
     "mem_pool.C": "cpp",
     "thread.C": "cpp",
-    "machine.C": "cpp"
+    "machine.C": "cpp",
+    "console.C": "cpp"
   }
 }
