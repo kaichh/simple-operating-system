@@ -44,6 +44,7 @@ class Inode
 
 private:
   long id; // File "name"
+  int block_id; // Block where the file is stored. 
 
   /* You will need additional information in the inode, such as allocation 
      information. */
@@ -123,5 +124,8 @@ public:
 
   bool DeleteFile(int _file_id);
   /* Delete file with given id in the file system; free any disk block occupied by the file. */
+
+  int GetFreeBlock();
+  /* Find a free block in the disk and return the block id. If no block found, return -1. */
 };
 #endif
