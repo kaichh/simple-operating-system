@@ -39,7 +39,11 @@
 
 FileSystem::FileSystem() {
     Console::puts("In file system constructor.\n");
-    assert(false);
+    disk = NULL;
+    size = 0;
+    // inodes = NULL;
+    inodes = new Inode[MAX_INODES];
+    free_blocks = NULL;
 }
 
 FileSystem::~FileSystem() {
@@ -56,10 +60,9 @@ FileSystem::~FileSystem() {
 
 bool FileSystem::Mount(SimpleDisk * _disk) {
     Console::puts("mounting file system from disk\n");
-
     /* Here you read the inode list and the free list into memory */
     
-    assert(false);
+    //
 }
 
 bool FileSystem::Format(SimpleDisk * _disk, unsigned int _size) { // static!
@@ -67,7 +70,18 @@ bool FileSystem::Format(SimpleDisk * _disk, unsigned int _size) { // static!
     /* Here you populate the disk with an initialized (probably empty) inode list
        and a free list. Make sure that blocks used for the inodes and for the free list
        are marked as used, otherwise they may get overwritten. */
-    assert(false);
+    
+    // Set the inodes list with size MAX_INODES to 0 and write to block 0
+    Inode * empty_inode_block = new Inode[MAX_INODES];
+    memset(empty_inode_block, 0, MAX_INODES);
+    _disk->write(0, (unsigned char *) empty_inode_block);
+
+    // Mark the 1st and 2nd position as used and write to the disk at block 1
+    unsigned char empty_free_block[SimpleDisk::BLOCK_SIZE];
+    memset(empty_free_block, 0, SimpleDisk::BLOCK_SIZE);
+    empty_free_block[0] = 1;
+    empty_free_block[1] = 1;
+    _disk->write(1, empty_free_block);
 }
 
 Inode * FileSystem::LookupFile(int _file_id) {
@@ -89,4 +103,6 @@ bool FileSystem::DeleteFile(int _file_id) {
     /* First, check if the file exists. If not, throw an error. 
        Then free all blocks that belong to the file and delete/invalidate 
        (depending on your implementation of the inode list) the inode. */
+    
+    //
 }

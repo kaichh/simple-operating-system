@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "*.js": "javascriptreact",
+    "kernel.C": "cpp",
+    "frame_pool.C": "cpp",
+    "file_system.C": "cpp",
+    "file.C": "cpp",
+    "simple_disk.C": "cpp"
+  }
+}

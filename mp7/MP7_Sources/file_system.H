@@ -55,6 +55,9 @@ private:
 
   /* You may need a few additional functions to help read and store the 
      inodes from and to disk. */
+  // next inode, prev inode
+  
+
 };
 
 /*--------------------------------------------------------------------------*/
