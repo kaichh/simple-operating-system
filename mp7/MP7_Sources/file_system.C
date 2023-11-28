@@ -41,15 +41,22 @@ FileSystem::FileSystem() {
     Console::puts("In file system constructor.\n");
     disk = NULL;
     size = 0;
-    // inodes = NULL;
-    inodes = new Inode[MAX_INODES];
+    inodes = NULL;
+    // inodes = new Inode[MAX_INODES];
     free_blocks = NULL;
 }
 
 FileSystem::~FileSystem() {
     Console::puts("unmounting file system\n");
     /* Make sure that the inode list and the free list are saved. */
-    assert(false);
+    
+    // Write the inode list to block 0
+    disk->write(0, (unsigned char *) inodes);
+    // Write the free list to block 1
+    disk->write(1, free_blocks);
+    
+    delete inodes;
+    delete free_blocks;
 }
 
 
@@ -125,6 +132,8 @@ bool FileSystem::CreateFile(int _file_id) {
         if(inodes[i].id == 0) { 
             inodes[i].id = _file_id;
             inodes[i].block_id = free_block_id;
+            inodes[i].fs = this;
+            inodes[i].size = 0;
             
             // Mark the block as used in the free list
             free_blocks[inodes[i].block_id] = 1;
@@ -161,7 +170,8 @@ bool FileSystem::DeleteFile(int _file_id) {
     file_inode->id = 0;
     file_inode->block_id = 0;
     file_inode->fs = NULL;
-    
+    file_inode->size = 0;
+
     return true;
 }
 
@@ -185,3 +195,11 @@ int FileSystem::GetFreeBlock() {
     Console::puts("no free block found!!\n");
     return -1;
 }
+
+// unsigned char * FileSystem::GetBlockIds(int _block_id) {
+//     Console::puts("getting actual block ids\n");
+    
+//     unsigned char * block_ids = new unsigned char[SimpleDisk::BLOCK_SIZE];
+//     disk->read(_block_id, block_ids);
+//     return block_ids;
+// }

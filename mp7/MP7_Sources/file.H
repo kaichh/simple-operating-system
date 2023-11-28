@@ -49,6 +49,7 @@ private:
        file system. 
        You may also want a current position, which indicates which position in 
        the file you will read or write next. */
+    unsigned int curr_pos;
     
     unsigned char block_cache[SimpleDisk::BLOCK_SIZE];
     /* It will be helpful to have a cached copy of the block that you are reading
@@ -56,6 +57,14 @@ private:
        you can cache here. You read the data from disk to cache whenever you open the
        file, and you write the data to disk whenever you close the file. 
     */
+    
+    FileSystem * fs;
+    int id;
+    Inode * inode;
+    unsigned char * block_ids;
+    
+    unsigned int MAX_FILE_SIZE = SimpleDisk::BLOCK_SIZE * 128;
+    /* MAX_FILE_SIZE = 64KB = 128 blocks */ 
 
 public:
 
@@ -70,6 +79,7 @@ public:
     /* Read _n characters from the file starting at the current position and
        copy them in _buf.  Return the number of characters read. 
        Do not read beyond the end of the file. */
+    /* Do not support continue reading. Every time the function is called, it will start reading from the beginning */
     
     int Write(unsigned int _n, const char * _buf);
     /* Write _n characters to the file starting at the current position. If the write
@@ -77,12 +87,14 @@ public:
        written or until the maximum file size is reached. Do not write beyond the maximum
        length of the file.  
        Return the number of characters written. */
+    /* Do not support continue writing. Every time the function is called, it will start writing from the beginning */
     
     void Reset();
     /* Set the ’current position’ to the beginning of the file. */
     
     bool EoF();
     /* Is the current position for the file at the end of the file? */
+
 
 };
 

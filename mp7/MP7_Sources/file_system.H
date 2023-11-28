@@ -42,9 +42,10 @@ class Inode
   friend class File;       // File System and File. We give both full access
                            // to the Inode.
 
-private:
+public:
   long id; // File "name"
   int block_id; // Block where the file is stored. 
+  int size; // File size in bytes.
 
   /* You will need additional information in the inode, such as allocation 
      information. */
@@ -56,8 +57,6 @@ private:
 
   /* You may need a few additional functions to help read and store the 
      inodes from and to disk. */
-  // next inode, prev inode
-  
 
 };
 
@@ -78,8 +77,7 @@ class FileSystem
 
 private:
   /* -- DEFINE YOUR FILE SYSTEM DATA STRUCTURES HERE. */
-
-  SimpleDisk *disk;
+  
   unsigned int size;
 
   static constexpr unsigned int MAX_INODES = SimpleDisk::BLOCK_SIZE / sizeof(Inode);
@@ -101,6 +99,8 @@ private:
      blocks. These functions also come useful to class Inode and File. */
 
 public:
+  SimpleDisk *disk;
+
   FileSystem();
   /* Just initializes local data structures. Does not connect to disk yet. */
 
@@ -127,5 +127,8 @@ public:
 
   int GetFreeBlock();
   /* Find a free block in the disk and return the block id. If no block found, return -1. */
+  
+//   unsigned char * GetBlockIds(int _block_id);
+//   /* Get the actual block ids that the file is using given inode.block_id. */
 };
 #endif
