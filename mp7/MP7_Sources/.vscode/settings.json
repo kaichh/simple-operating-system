@@ -6,6 +6,7 @@
     "file_system.C": "cpp",
     "file.C": "cpp",
     "simple_disk.C": "cpp",
-    "utils.C": "cpp"
+    "utils.C": "cpp",
+    "console.C": "cpp"
   }
 }

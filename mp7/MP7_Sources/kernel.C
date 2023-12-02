@@ -101,31 +101,34 @@ FileSystem * FILE_SYSTEM;
 
 void exercise_file_system(FileSystem * _file_system) {
     
-    const char * STRING1 = "01234567890123456789";
-    const char * STRING2 = "abcdefghijabcdefghij";
+    // const char * STRING1 = "01234567890123456789";
+    // const char * STRING2 = "abcdefghijabcdefghij";
+    const char * STRING1 = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+    const char * STRING2 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     
     /* -- Create two files -- */
-    
+    Console::puts("Creating files...\n");
     assert(_file_system->CreateFile(1));
     assert(_file_system->CreateFile(2));
     
     /* -- "Open" the two files -- */
-    
+    Console::puts("Writing section started...\n");
     {
         File file1(_file_system, 1);
     
         File file2(_file_system, 2);
     
         /* -- Write into File 1 -- */
-        file1.Write(20, STRING1);
+        // file1.Write(20, STRING1);
+        file1.Write(sizeof(STRING1), STRING1);
     
         /* -- Write into File 2 -- */
-    
-        file2.Write(20, STRING2);
+        // file2.Write(20, STRING2);
+        file2.Write(sizeof(STRING2), STRING2);
     
         /* -- Files will get automatically closed when we leave scope  -- */
     }
-
+    Console::puts("Reading section started...\n");
     {   
         /* -- "Open files again -- */
         File file1(_file_system, 1);
@@ -133,17 +136,17 @@ void exercise_file_system(FileSystem * _file_system) {
     
         /* -- Read from File 1 and check result -- */
         file1.Reset();
-        char result1[30];
-        assert(file1.Read(20, result1) == 20);
-        for(int i = 0; i < 20; i++) {
-             assert(result1[i] == STRING1[i]);
+        char result1[sizeof(STRING1)];
+        assert(file1.Read(sizeof(STRING1), result1) == sizeof(STRING1));
+        for(int i = 0; i < sizeof(STRING1); i++) {           
+            assert(result1[i] == STRING1[i]);
         }
     
         /* -- Read from File 2 and check result -- */
         file2.Reset();
-        char result2[30];
-        assert(file2.Read(20, result2) == 20);
-        for(int i = 0; i < 20; i++) {
+        char result2[sizeof(STRING2)];
+        assert(file2.Read(sizeof(STRING2), result2) == sizeof(STRING2));
+        for(int i = 0; i < sizeof(STRING2); i++) {
             assert(result2[i] == STRING2[i]);
         }
     
@@ -248,6 +251,7 @@ int main() {
     assert(FILE_SYSTEM->Mount(SYSTEM_DISK)); // 'connect' disk to file system.
 
     for(int j = 0;; j++) {
+        Console::puts("Iteration: "); Console::puti(j); Console::puts("\n");
         exercise_file_system(FILE_SYSTEM);
     }
 

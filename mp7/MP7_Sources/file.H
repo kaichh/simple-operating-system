@@ -61,7 +61,7 @@ private:
     FileSystem * fs;
     int id;
     Inode * inode;
-    unsigned char * block_ids;
+    unsigned char block_ids[SimpleDisk::BLOCK_SIZE];
     
     unsigned int MAX_FILE_SIZE = SimpleDisk::BLOCK_SIZE * 128;
     /* MAX_FILE_SIZE = 64KB = 128 blocks */ 
@@ -94,8 +94,6 @@ public:
     
     bool EoF();
     /* Is the current position for the file at the end of the file? */
-
-
 };
 
 #endif

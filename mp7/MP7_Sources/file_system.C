@@ -73,6 +73,7 @@ bool FileSystem::Mount(SimpleDisk * _disk) {
     size = _disk->size();
     
     unsigned char * temp_inode_block  = new unsigned char[SimpleDisk::BLOCK_SIZE];
+    memset(temp_inode_block,0,SimpleDisk::BLOCK_SIZE);
     disk->read(0, temp_inode_block);
     inodes = (Inode *) temp_inode_block;
 
@@ -101,6 +102,13 @@ bool FileSystem::Format(SimpleDisk * _disk, unsigned int _size) { // static!
     empty_free_block[1] = 1;
     _disk->write(1, empty_free_block);
 
+    // unsigned char empty_block[SimpleDisk::BLOCK_SIZE];
+    // memset(empty_block, 0, SimpleDisk::BLOCK_SIZE);
+    // _disk->write(0,empty_block);
+    // empty_block[0] = 1;
+    // empty_block[1] = 1;
+    // _disk->write(1, empty_block);
+
     return true;
 }
 
@@ -125,6 +133,7 @@ bool FileSystem::CreateFile(int _file_id) {
     int free_block_id = GetFreeBlock();
 
     if(LookupFile(_file_id) != NULL || free_block_id == -1) {
+        Console::puts("file already exists or no free block found\n");
         return false;
     }
     // Find a free inode and initialize it
@@ -163,6 +172,7 @@ bool FileSystem::DeleteFile(int _file_id) {
             free_blocks[block_ids[i]] = 0;
         }
     }
+
     // Then we can free the block_id of the inode itself
     free_blocks[file_inode->block_id] = 0;
 
@@ -195,11 +205,3 @@ int FileSystem::GetFreeBlock() {
     Console::puts("no free block found!!\n");
     return -1;
 }
-
-// unsigned char * FileSystem::GetBlockIds(int _block_id) {
-//     Console::puts("getting actual block ids\n");
-    
-//     unsigned char * block_ids = new unsigned char[SimpleDisk::BLOCK_SIZE];
-//     disk->read(_block_id, block_ids);
-//     return block_ids;
-// }
