@@ -42,7 +42,6 @@ FileSystem::FileSystem() {
     disk = NULL;
     size = 0;
     inodes = NULL;
-    // inodes = new Inode[MAX_INODES];
     free_blocks = NULL;
 }
 
@@ -101,13 +100,6 @@ bool FileSystem::Format(SimpleDisk * _disk, unsigned int _size) { // static!
     empty_free_block[0] = 1;
     empty_free_block[1] = 1;
     _disk->write(1, empty_free_block);
-
-    // unsigned char empty_block[SimpleDisk::BLOCK_SIZE];
-    // memset(empty_block, 0, SimpleDisk::BLOCK_SIZE);
-    // _disk->write(0,empty_block);
-    // empty_block[0] = 1;
-    // empty_block[1] = 1;
-    // _disk->write(1, empty_block);
 
     return true;
 }

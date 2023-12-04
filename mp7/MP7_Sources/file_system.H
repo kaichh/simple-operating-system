@@ -127,8 +127,5 @@ public:
 
   int GetFreeBlock();
   /* Find a free block in the disk and return the block id. If no block found, return -1. */
-  
-//   unsigned char * GetBlockIds(int _block_id);
-//   /* Get the actual block ids that the file is using given inode.block_id. */
 };
 #endif
